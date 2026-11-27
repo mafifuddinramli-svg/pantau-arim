@@ -116,6 +116,13 @@ footer{font-size:13px;color:var(--mute);border-top:1px solid var(--line)}
 .ptab th,.ptab td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
 .ptab th{color:var(--mute);font-weight:600}.ptab td.r,.ptab th.r{text-align:right}
 .note{font-size:13px;color:var(--mute);margin-top:10px}
+.live{margin-top:20px}
+.live .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:20px}
+.live .tvw{min-height:220px}
+.live .src{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.live .src a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;color:inherit;background:var(--bg);font-size:14px}
+.live .src a:hover{border-color:var(--co)}
+@media(max-width:900px){.live .row{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:900px){.stk{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:900px){.tl{grid-template-columns:minmax(0,1fr);border-left:4px solid var(--co);margin-left:8px}.tl::before{display:none}.step{padding:0 0 18px 24px}.step::before{left:-12px;top:2px}.guide{grid-template-columns:minmax(0,1fr)}.figs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.status{grid-template-columns:minmax(0,1fr)}.steps{grid-template-columns:minmax(0,1fr)}}
@@ -160,19 +167,32 @@ footer{font-size:13px;color:var(--mute);border-top:1px solid var(--line)}
 
 <section class="band" id="saham"><div class="wrap">
 <h2>Saham Zetrix AI (ZETRIX, 0138)</h2>
-<p class="sub">Harga penutup saham Zetrix AI di Bursa Malaysia, dikemas kini pada setiap semakan berjadual. Harga bukan masa nyata.</p>
+<p class="sub">Harga penutup saham Zetrix AI di Bursa Malaysia (dikemas kini setiap semakan berjadual), serta harga langsung daripada TradingView.</p>
 <div class="stk">
 <div class="panel">
 <div class="lbl">Harga penutup terkini</div>
 <div class="num" id="sPrice">–</div>
 <div class="chg" id="sChg"></div>
 <dl id="sInfo"></dl>
-<p class="note">Untuk harga masa nyata, semak <a href="https://www.bursamalaysia.com/trade/trading_resources/listing_directory/company-profile?stock_code=0138">Bursa Malaysia</a> atau <a href="https://klse.i3investor.com/web/stock/overview/0138">i3investor</a>. Bukan nasihat pelaburan.</p>
+<p class="note">Harga ini dikemas kini oleh semakan berjadual. Lihat harga langsung di bawah. Bukan nasihat pelaburan.</p>
 </div>
 <div class="panel chart">
 <div class="lbl">Pergerakan harga (sen)</div>
 <div id="sChart" role="img" aria-label="Carta harga penutup saham Zetrix AI"></div>
 <table class="ptab"><thead><tr><th>Tarikh</th><th class="r">Harga</th><th>Sumber</th></tr></thead><tbody id="sTab"></tbody></table>
+</div>
+</div>
+<div class="panel live">
+<div class="lbl">Harga langsung (TradingView · data Bursa mungkin tertangguh ~15 minit)</div>
+<div class="row"><div class="tvw" id="tvInfo"></div><div class="tvw" id="tvMini"></div></div>
+<p class="note" id="tvNote">Jika widget tidak dipaparkan, guna pautan di bawah.</p>
+<div class="src">
+<a href="https://www.bursamalaysia.com/trade/trading_resources/listing_directory/company-profile?stock_code=0138">Bursa Malaysia</a>
+<a href="https://www.tradingview.com/symbols/MYX-ZETRIX/">TradingView</a>
+<a href="https://klse.i3investor.com/web/stock/overview/0138">i3investor</a>
+<a href="https://www.klsescreener.com/v2/stocks/view/0138">KLSE Screener</a>
+<a href="https://www.isaham.my/stock/zetrix">iSaham</a>
+<a href="https://finance.yahoo.com/quote/0138.KL/">Yahoo Finance</a>
 </div>
 </div>
 </div></section>
@@ -266,6 +286,14 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=d=>{try{return new Date(d+'T00:00:00+08:00').toLocaleDateString('ms-MY',{day:'numeric',month:'short',year:'numeric'})}catch(e){return d}};
 $('upd').textContent='Kemas kini terakhir: '+UPDATED;
+
+{
+  const dark=(document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark';
+  const tv=(id,file,cfg)=>{const host=$(id);if(!host)return;const w=document.createElement('div');w.className='tradingview-widget-container';const inner=document.createElement('div');inner.className='tradingview-widget-container__widget';w.appendChild(inner);const sc=document.createElement('script');sc.src='https://s3.tradingview.com/external-embedding/'+file;sc.async=true;sc.text=JSON.stringify(cfg);w.appendChild(sc);host.appendChild(w);};
+  const base={symbol:'MYX:ZETRIX',locale:'en',colorTheme:dark?'dark':'light',isTransparent:true};
+  tv('tvInfo','embed-widget-symbol-info.js',Object.assign({width:'100%'},base));
+  tv('tvMini','embed-widget-mini-symbol-overview.js',Object.assign({width:'100%',height:220,dateRange:'3M',autosize:false,trendLineColor:'#1240e0',underLineColor:'rgba(18,64,224,0.15)'},base));
+}
 const SAHAM=[{"date": "2026-02-27", "close": 0.82, "source": "StockAnalysis", "url": "https://stockanalysis.com/quote/klse/ZETRIX/history"}, {"date": "2026-08-27", "close": 0.595, "source": "The Edge Malaysia", "url": "https://theedgemalaysia.com/node/816099"}, {"date": "2026-08-28", "close": 0.295, "source": "The Edge Malaysia", "url": "https://theedgemalaysia.com/node/816099"}, {"date": "2026-09-01", "close": 0.22, "source": "The Edge Malaysia", "url": "https://theedgemalaysia.com/node/816535"}, {"date": "2026-09-03", "close": 0.24, "source": "NST", "url": "https://www.nst.com.my/amp/business/corporate/2026/09/1525475/zetrix-ai-shares-surge-over-20pct-second-day-rebound"}, {"date": "2026-09-04", "close": 0.255, "source": "NST", "url": "https://www.nst.com.my/amp/business/corporate/2026/09/1525475/zetrix-ai-shares-surge-over-20pct-second-day-rebound"}, {"date": "2026-09-09", "close": 0.27, "source": "BusinessToday", "url": "https://www.businesstoday.com.my/2026/09/10/stock-today-zetrix-ai-falls-1-85-after-defending-rm130-million-acquisition-valuation/"}, {"date": "2026-10-05", "close": 0.065, "source": "Malaysiakini / Bernama", "url": "https://malaysiakini.com/news/886317-zetrix-ai-submits-proposed-solution-to-govt-on-rm314m-outstanding-remittances"}, {"date": "2026-10-13", "close": 0.065, "source": "Investing.com", "url": "https://ph.investing.com/equities/my-eg-services-bhd"}, {"date": "2026-10-23", "close": 0.075, "source": "Malay Mail", "url": "https://malaymail.com/news/money/2026/10/23/zetrix-ai-redesignates-norraesah-mohamad-as-non-executive-chairman/240365"}, {"date": "2026-11-06", "close": 0.065, "mcap": "RM525.11 juta", "source": "The Edge Malaysia", "url": "https://theedgemalaysia.com/node/824905"}, {"date": "2026-11-11", "close": 0.055, "mcap": "RM412.59 juta", "source": "The Edge Malaysia", "url": "https://theedgemalaysia.com/node/825399"}, {"date": "2026-11-23", "close": 0.055, "mcap": "RM452 juta", "source": "The Edge Malaysia", "url": "https://theedgemalaysia.com/node/826931"}];
 {
   const S=SAHAM.slice().sort((a,b)=>a.date<b.date?-1:1);
